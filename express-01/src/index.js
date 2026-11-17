@@ -31,6 +31,11 @@ app.use(limiter);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Rota raiz para testar status
+app.get('/', (req, res) => {
+  res.status(200).json({ status: 'ok', message: 'API AOS 2026.2 ativa' });
+});
+
 // Rotas
 app.use('/users', userRouter);
 app.use('/messages', messageRouter);
@@ -39,13 +44,20 @@ app.use('/tarefas', tarefaRouter);
 // Tratamento de erros global
 app.use(errorMiddleware);
 
-// Sincroniza banco e inicia servidor
+// Sincroniza banco e inicia servidor apenas em ambiente local
 const PORT = process.env.PORT || 3000;
 const ERASE = process.env.ERASE_DATABASE_ON_SYNC === 'true';
 
-db.sequelize.sync({ force: ERASE }).then(() => {
-  console.log('Banco sincronizado.');
-  app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
-});
+if (process.env.NODE_ENV !== 'production') {
+  db.sequelize.sync({ force: ERASE }).then(() => {
+    console.log('Banco sincronizado.');
+    app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
+  });
+} else {
+  // Em produção (Vercel Serverless), sincroniza sem bloquear requisições
+  db.sequelize.sync({ force: false }).catch((err) => {
+    console.error('Erro ao sincronizar Sequelize na Vercel:', err);
+  });
+}
 
 export default app;
