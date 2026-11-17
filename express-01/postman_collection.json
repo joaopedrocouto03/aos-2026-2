@@ -1,0 +1,183 @@
+{
+  "info": {
+    "name": "AOS 2026.2 — API de Tarefas",
+    "_postman_id": "aos-tarefas-collection",
+    "description": "Coleção completa para testar a API de Tarefas. Use o Runner na ordem listada (excluir por último).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://SEU-PROJETO.vercel.app",
+      "type": "string"
+    },
+    {
+      "key": "objectId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Criar Tarefa (201)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status é 201', () => pm.response.to.have.status(201));",
+              "const json = pm.response.json();",
+              "pm.test('Retorna objectId', () => pm.expect(json.objectId).to.be.a('string'));",
+              "pm.collectionVariables.set('objectId', json.objectId);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"descricao\": \"Estudar Express 5\",\n  \"concluida\": false\n}"
+        },
+        "url": "{{baseUrl}}/tarefas"
+      }
+    },
+    {
+      "name": "2. Listar Tarefas (200)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status é 200', () => pm.response.to.have.status(200));",
+              "pm.test('Retorna array', () => pm.expect(pm.response.json()).to.be.an('array'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/tarefas"
+      }
+    },
+    {
+      "name": "3. Buscar Tarefa por ID (200)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status é 200', () => pm.response.to.have.status(200));",
+              "pm.test('objectId confere', () => pm.expect(pm.response.json().objectId).to.eql(pm.collectionVariables.get('objectId')));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/tarefas/{{objectId}}"
+      }
+    },
+    {
+      "name": "4. Atualizar Tarefa (200)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status é 200', () => pm.response.to.have.status(200));",
+              "pm.test('concluida é true', () => pm.expect(pm.response.json().concluida).to.be.true);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"concluida\": true\n}"
+        },
+        "url": "{{baseUrl}}/tarefas/{{objectId}}"
+      }
+    },
+    {
+      "name": "5. ERRO — 400 sem descricao",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status é 400', () => pm.response.to.have.status(400));",
+              "pm.test('status é fail', () => pm.expect(pm.response.json().status).to.eql('fail'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{}"
+        },
+        "url": "{{baseUrl}}/tarefas"
+      }
+    },
+    {
+      "name": "6. ERRO — 400 UUID inválido",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status é 400', () => pm.response.to.have.status(400));",
+              "pm.test('status é fail', () => pm.expect(pm.response.json().status).to.eql('fail'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/tarefas/id-invalido-nao-e-uuid"
+      }
+    },
+    {
+      "name": "7. ERRO — 404 Tarefa inexistente",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status é 404', () => pm.response.to.have.status(404));",
+              "pm.test('status é fail', () => pm.expect(pm.response.json().status).to.eql('fail'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/tarefas/00000000-0000-0000-0000-000000000000"
+      }
+    },
+    {
+      "name": "8. Excluir Tarefa (200)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status é 200', () => pm.response.to.have.status(200));",
+              "pm.test('Mensagem de sucesso', () => pm.expect(pm.response.json().mensagem).to.include('sucesso'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "url": "{{baseUrl}}/tarefas/{{objectId}}"
+      }
+    }
+  ]
+}
