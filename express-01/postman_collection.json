@@ -2,13 +2,13 @@
   "info": {
     "name": "AOS 2026.2 — API de Tarefas",
     "_postman_id": "aos-tarefas-collection",
-    "description": "Coleção completa para testar a API de Tarefas. Use o Runner na ordem listada (excluir por último).",
+    "description": "Coleção completa para testar a API de Tarefas na Vercel. Execute o Runner na ordem listada (excluir por último).",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
     {
       "key": "baseUrl",
-      "value": "https://SEU-PROJETO.vercel.app",
+      "value": "https://aos-2026-2-psi.vercel.app",
       "type": "string"
     },
     {
@@ -25,9 +25,10 @@
           "listen": "test",
           "script": {
             "exec": [
-              "pm.test('Status é 201', () => pm.response.to.have.status(201));",
+              "pm.test('Status code é 201', function () { pm.response.to.have.status(201); });",
               "const json = pm.response.json();",
-              "pm.test('Retorna objectId', () => pm.expect(json.objectId).to.be.a('string'));",
+              "pm.test('Retorna objectId UUID', function () { pm.expect(json.objectId).to.be.a('string'); });",
+              "pm.test('Retorna descricao correta', function () { pm.expect(json.descricao).to.eql('Estudar Express 5 e Sequelize'); });",
               "pm.collectionVariables.set('objectId', json.objectId);"
             ]
           }
@@ -35,12 +36,25 @@
       ],
       "request": {
         "method": "POST",
-        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"descricao\": \"Estudar Express 5\",\n  \"concluida\": false\n}"
+          "raw": "{\n  \"descricao\": \"Estudar Express 5 e Sequelize\",\n  \"concluida\": false\n}"
         },
-        "url": "{{baseUrl}}/tarefas"
+        "url": {
+          "raw": "{{baseUrl}}/tarefas",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "tarefas"
+          ]
+        }
       }
     },
     {
@@ -50,15 +64,24 @@
           "listen": "test",
           "script": {
             "exec": [
-              "pm.test('Status é 200', () => pm.response.to.have.status(200));",
-              "pm.test('Retorna array', () => pm.expect(pm.response.json()).to.be.an('array'));"
+              "pm.test('Status code é 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Retorna um array de tarefas', function () { pm.expect(pm.response.json()).to.be.an('array'); });"
             ]
           }
         }
       ],
       "request": {
         "method": "GET",
-        "url": "{{baseUrl}}/tarefas"
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/tarefas",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "tarefas"
+          ]
+        }
       }
     },
     {
@@ -68,15 +91,26 @@
           "listen": "test",
           "script": {
             "exec": [
-              "pm.test('Status é 200', () => pm.response.to.have.status(200));",
-              "pm.test('objectId confere', () => pm.expect(pm.response.json().objectId).to.eql(pm.collectionVariables.get('objectId')));"
+              "pm.test('Status code é 200', function () { pm.response.to.have.status(200); });",
+              "const json = pm.response.json();",
+              "pm.test('objectId confere', function () { pm.expect(json.objectId).to.eql(pm.collectionVariables.get('objectId')); });"
             ]
           }
         }
       ],
       "request": {
         "method": "GET",
-        "url": "{{baseUrl}}/tarefas/{{objectId}}"
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/tarefas/{{objectId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "tarefas",
+            "{{objectId}}"
+          ]
+        }
       }
     },
     {
@@ -86,20 +120,35 @@
           "listen": "test",
           "script": {
             "exec": [
-              "pm.test('Status é 200', () => pm.response.to.have.status(200));",
-              "pm.test('concluida é true', () => pm.expect(pm.response.json().concluida).to.be.true);"
+              "pm.test('Status code é 200', function () { pm.response.to.have.status(200); });",
+              "const json = pm.response.json();",
+              "pm.test('concluida atualizada para true', function () { pm.expect(json.concluida).to.be.true; });"
             ]
           }
         }
       ],
       "request": {
         "method": "PUT",
-        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
         "body": {
           "mode": "raw",
           "raw": "{\n  \"concluida\": true\n}"
         },
-        "url": "{{baseUrl}}/tarefas/{{objectId}}"
+        "url": {
+          "raw": "{{baseUrl}}/tarefas/{{objectId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "tarefas",
+            "{{objectId}}"
+          ]
+        }
       }
     },
     {
@@ -109,20 +158,33 @@
           "listen": "test",
           "script": {
             "exec": [
-              "pm.test('Status é 400', () => pm.response.to.have.status(400));",
-              "pm.test('status é fail', () => pm.expect(pm.response.json().status).to.eql('fail'));"
+              "pm.test('Status code é 400', function () { pm.response.to.have.status(400); });",
+              "pm.test('status é fail', function () { pm.expect(pm.response.json().status).to.eql('fail'); });"
             ]
           }
         }
       ],
       "request": {
         "method": "POST",
-        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
         "body": {
           "mode": "raw",
-          "raw": "{}"
+          "raw": "{\n  \"concluida\": true\n}"
         },
-        "url": "{{baseUrl}}/tarefas"
+        "url": {
+          "raw": "{{baseUrl}}/tarefas",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "tarefas"
+          ]
+        }
       }
     },
     {
@@ -132,15 +194,25 @@
           "listen": "test",
           "script": {
             "exec": [
-              "pm.test('Status é 400', () => pm.response.to.have.status(400));",
-              "pm.test('status é fail', () => pm.expect(pm.response.json().status).to.eql('fail'));"
+              "pm.test('Status code é 400', function () { pm.response.to.have.status(400); });",
+              "pm.test('status é fail', function () { pm.expect(pm.response.json().status).to.eql('fail'); });"
             ]
           }
         }
       ],
       "request": {
         "method": "GET",
-        "url": "{{baseUrl}}/tarefas/id-invalido-nao-e-uuid"
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/tarefas/uuid-invalido-123",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "tarefas",
+            "uuid-invalido-123"
+          ]
+        }
       }
     },
     {
@@ -150,15 +222,25 @@
           "listen": "test",
           "script": {
             "exec": [
-              "pm.test('Status é 404', () => pm.response.to.have.status(404));",
-              "pm.test('status é fail', () => pm.expect(pm.response.json().status).to.eql('fail'));"
+              "pm.test('Status code é 404', function () { pm.response.to.have.status(404); });",
+              "pm.test('status é fail', function () { pm.expect(pm.response.json().status).to.eql('fail'); });"
             ]
           }
         }
       ],
       "request": {
         "method": "GET",
-        "url": "{{baseUrl}}/tarefas/00000000-0000-0000-0000-000000000000"
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/tarefas/00000000-0000-0000-0000-000000000000",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "tarefas",
+            "00000000-0000-0000-0000-000000000000"
+          ]
+        }
       }
     },
     {
@@ -168,15 +250,25 @@
           "listen": "test",
           "script": {
             "exec": [
-              "pm.test('Status é 200', () => pm.response.to.have.status(200));",
-              "pm.test('Mensagem de sucesso', () => pm.expect(pm.response.json().mensagem).to.include('sucesso'));"
+              "pm.test('Status code é 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Retorna mensagem de sucesso', function () { pm.expect(pm.response.json().mensagem).to.include('sucesso'); });"
             ]
           }
         }
       ],
       "request": {
         "method": "DELETE",
-        "url": "{{baseUrl}}/tarefas/{{objectId}}"
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/tarefas/{{objectId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "tarefas",
+            "{{objectId}}"
+          ]
+        }
       }
     }
   ]

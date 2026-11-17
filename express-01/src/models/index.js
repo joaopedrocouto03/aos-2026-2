@@ -1,5 +1,6 @@
 // Inicializa o Sequelize, registra todos os modelos e define associações
 import { Sequelize } from 'sequelize';
+import pg from 'pg';
 import { getUserModel } from './user.js';
 import { getMessageModel } from './message.js';
 import { getSessionModel } from './session.js';
@@ -7,6 +8,7 @@ import { getTarefaModel } from './tarefa.js';
 
 const sequelize = new Sequelize(process.env.DATABASE_URL, {
   dialect: 'postgres',
+  dialectModule: pg,
   dialectOptions: {
     ssl: {
       require: true,
